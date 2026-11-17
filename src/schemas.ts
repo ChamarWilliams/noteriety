@@ -12,10 +12,12 @@ import { usersSchema } from './schemas/users-schema'
 import { settingsSchema } from './schemas/admin-schema'
 import { teamMembersSchema } from './schemas/team-members-schema'
 import { spacesSchema } from './schemas/spaces-schema'
+import { resourcesSchema } from './schemas/resources-schema'
 
 export const schemas: CollectionSchema[] = [
   usersSchema,
   settingsSchema,
   teamMembersSchema,
   spacesSchema,
+  resourcesSchema,
 ]
