@@ -15,6 +15,7 @@ import { spacesSchema } from './schemas/spaces-schema'
 import { resourcesSchema } from './schemas/resources-schema'
 import { notesSchema } from './schemas/notes-schema'
 import { tagsSchema } from './schemas/tags-schema'
+import { annotationsSchema } from './schemas/annotations-schema'
 
 export const schemas: CollectionSchema[] = [
   usersSchema,
@@ -24,4 +25,5 @@ export const schemas: CollectionSchema[] = [
   resourcesSchema,
   notesSchema,
   tagsSchema,
+  annotationsSchema,
 ]

@@ -7,8 +7,8 @@ import type { CollectionSchema } from 'deepspace/schema'
 export const tagsSchema: CollectionSchema = {
   name: 'tags',
   columns: [
-    {name: 'teamId', storage: 'text', interpretation: 'plain', required: true},
-    {name: 'name', storage: 'text', interpretation: 'plain', required: true, maxLength: 40},
+    { name: 'teamId', storage: 'text', interpretation: 'plain', required: true},
+    { name: 'name', storage: 'text', interpretation: 'plain', required: true, maxLength: 40},
 
   ],
   teamField: 'teamId',
