@@ -1,0 +1,32 @@
+/**
+ *  Notes - Schema
+ */
+
+import type { CollectionSchema } from 'deepspace/schema'
+
+export const notesSchema: CollectionSchema = {
+  name: 'notes',
+  columns: [
+    { name: 'spaceId', storage: 'text', interpretation: 'plain', required: true},
+    { name: 'sharedTeamId', storage: 'text', interpretation: 'plain', default: ''},
+    { name: "title", storage: 'text', interpretation: 'plain', required: true, maxLength: 120},
+    { name: 'body', storage: 'text', interpretation: 'plain', maxLength: 20000},
+    { name: 'fileKey', storage: 'text', interpretation: 'plain'},
+    { name: 'fileName', storage: 'text', interpretation: 'plain', maxLength: 200},
+    { name: 'tags', storage: 'text', interpretation: 'plain', default: '[]', maxLength: 1000},
+    { name: 'featured', storage: 'number', interpretation: { kind: 'boolean'}, default: 0},
+  ],
+  teamField: 'sharedTeamId',
+  permissions: {
+    '*': { read: false, create: false, update: false, delete: false},
+    viewer: { read: 'team', create: false, update: false, delete: false},
+    member: { 
+      read: 'team', 
+      create: false, 
+      update: 'own', 
+      delete: 'own',
+      writableFields: ['title', 'body', 'tags', 'fileKey', 'fileName'],
+    },
+    admin: { read: true, create: true, update: true, delete: true},
+  },
+}
