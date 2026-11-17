@@ -18,29 +18,30 @@
 
 /* Paper — light example theme; shows the full token contract incl.
  * `color-scheme: light`. Replace or delete it once the app has its own. */
-[data-theme="paper"] {
+[data-theme="notebook"] {
   color-scheme: light;
-  --color-background: #ffffff;
-  --color-foreground: #0a0a0a;
-  --color-card: #fafafa;
-  --color-card-foreground: #0a0a0a;
+  --color-background: #fbfaf7;
+  --color-foreground: #1f2233;
+  --color-card: #ffffff;
+  --color-card-foreground: #1f2233;
   --color-popover: #ffffff;
-  --color-popover-foreground: #0a0a0a;
-  --color-primary: #171717;
+  --color-popover-foreground: #1f2233;
+  --color-primary: #2e3a87;
   --color-primary-foreground: #ffffff;
-  --color-secondary: #f5f5f5;
-  --color-secondary-foreground: #0a0a0a;
-  --color-muted: #f5f5f5;
-  --color-muted-foreground: #525252;
-  --color-accent: #e5e5e5;
-  --color-accent-foreground: #0a0a0a;
+  --color-secondary: #f1efe8;
+  --color-secondary-foreground: #1f2233;
+  --color-muted: #f1efe8;
+  --color-muted-foreground: #5f6070;
+  --color-accent: #fcebc4;
+  --color-accent-foreground: #5a3e05;
   --color-destructive: #dc2626;
   --color-destructive-foreground: #ffffff;
-  --color-border: #e5e5e5;
-  --color-input: #e5e5e5;
-  --color-ring: #171717;
-  --shadow-card: 0 1px 2px 0 rgba(0, 0, 0, 0.016);
-  --shadow-card-hover: 0 2px 8px 0 rgba(0, 0, 0, 0.032);
-  --color-shell: #fafafa;
+  --color-border: #e6e3da;
+  --color-input: #e6e3da;
+  --color-ring: #2e3a87;
+  --shadow-card: 0 1px 2px 0 rgba(31, 34, 51, 0.04);
+  --shadow-card-hover: 0 2px 8px 0 rgba(31, 34, 51, 0.08);
+  --color-shell: #f5f3ee;
   --color-shell-panel: #ffffff;
+  --pin: #f2b544;
 }
