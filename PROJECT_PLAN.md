@@ -159,6 +159,7 @@ npx deepspace test run
 
 ### Open questions (settle in section 3)
 1. Can DeepSpace's `team` or `collaborator` permission levels handle per-space roles, or are server-side membership checks needed?
+   **Answer (checked in SDK 0.44.2):** both. A Space works as a DeepSpace "team". `'team'` lets members of a record's space read it, using a `team_members` collection (`teamId`, `userId`, `status`) and a `teamField` on each collection. But `create` can only be `true`/`false`, and `'team'` has no moderator/owner tiers, so creating records in a space and moderator/owner actions go through server actions that check `team_members` first.
 2. Tags: a list on each note, or a `note_tags` linking collection?
 3. App name (becomes `<name>.app.space`, globally unique)
 
