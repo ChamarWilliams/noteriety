@@ -74,6 +74,9 @@ A collaborative **Space** where members share resources and notes, annotate them
 - Payments
 - Custom role names and per-tag permissions
 
+### Future ideas (not for this submission)
+- **Audio/video resources with smooth playback:** load the first few seconds so playback starts instantly, and keep lower-quality versions to switch to on slow connections. Known as **adaptive bitrate streaming** (formats: HLS, DASH).
+
 ### Permission grid (add if time allows)
 | Capability | Owner | Moderator | Member |
 |---|---|---|---|
@@ -213,10 +216,11 @@ Each section depends on the ones before it. Finish a section's **Done when** che
 - [ ] Private notes hidden on the server, not just in the UI
 - [ ] Role checks on the server for every privileged action
 - [ ] Paid calls (AI, email) gated behind sign-in and rate limited
+- [ ] Per-user rate limit on pin/note creation (server action), plus max text length
 - [ ] Non-members can't read a space's records or files
 
 ## 9. Gotchas
-- `deploy` refuses uncommitted changes. Commit first.
+- This app deploys from GitHub, so `deploy` ships the current checkout as-is, even uncommitted or unpushed changes. Deploy only from a clean, pulled `master`.
 - Schema changes need a redeploy. Renames and drops are manual.
 - `<AuthGate>` only hides UI. Real protection is in permissions and server checks.
 - Writes are fire-and-forget by default. Use `*Confirmed` to catch rejections.
