@@ -1,4 +1,4 @@
-import type { ActionHandler } from 'deepspace/worker'
+import type { ActionHandler, ActionTools } from 'deepspace/worker'
 import type { Env } from '../../worker'
 
 //String containing all characters, where A = 0 and B = 1
@@ -9,6 +9,18 @@ function makeJoinCode(): string {
     const bytes = crypto.getRandomValues(new Uint8Array(6))
     // Shrinks each number to fit the list length then use the remainder as the look up key ie. CODE_CHARS[8] = 'J'
     return Array.from(bytes, (b) => CODE_CHARS[b % CODE_CHARS.length]).join('')
+}
+
+// Returns this user's membership row in a space, or null if they're not in it
+async function getMembership(tools:ActionTools, teamId: string, userId: string) {
+    const result = await tools.query<{ role: string}>('team_members',
+        {
+            where: { teamId, userId },
+            limit: 1,
+        }
+    )
+    if (!result.success) return null
+    return result.data.records[0] ?? null
 }
 
 export const actions: Record<string, ActionHandler<Env>> = {
@@ -50,7 +62,7 @@ export const actions: Record<string, ActionHandler<Env>> = {
         // Success: send back the new space's ID and join code
         return { success: true, data: { spaceId: teamId, joinCode}}
     },
-    joinSpace: async ({userId, params, tools }) => {
+    joinSpace: async ({ userId, params, tools }) => {
         //Retrieving the cleaned code input
         const code = typeof params.code === 'string' ? params.code.trim().toUpperCase() : ''
         //Input Validation
@@ -86,5 +98,34 @@ export const actions: Record<string, ActionHandler<Env>> = {
 
         // Success: tell the page which space was joined
         return {success: true, data: {spaceId: teamId, alreadyMember: false}}
-    }
+    },
+    setMemberRole: async ({ userId, params, tools }) => {
+        const spaceId = typeof params.spaceId === 'string' ? params.spaceId : ''
+        const targetUserId = typeof params.targetUserId === 'string' ? params.targetUserId : ''
+        const role = params.role
+        if (!spaceId || !targetUserId) {
+            return { success: false, error: 'Missing space or member.' }
+        }
+        if (role !== 'moderator' && role !== 'member') {
+            return { success: false, error: 'Role must be moderator or member.' }
+        }
+
+        const caller = await getMembership(tools, spaceId, userId)
+        if (caller?.data.role !== 'owner') {
+            return { success: false, error: 'Only the owner can change roles.' }
+        }
+        if (targetUserId === userId) {
+            return { success: false, error: 'You cannot change your own role.' }
+        }
+
+       const target = await getMembership(tools, spaceId, targetUserId)
+       if (!target) {
+        return { success: false, error: 'That person is not in this space.' }
+       }
+
+       const updated = await tools.update('team_members', target.recordId, { role })
+       if (!updated.success) return updated
+
+       return {success: true, data: { targetUserId, role }}
+    },
 }
