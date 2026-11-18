@@ -234,6 +234,9 @@ Each section depends on the ones before it. Finish a section's **Done when** che
 
 ---
 
+## SDK feedback found while building
+- **Joined spaces don't appear until a refresh (SDK 0.44.2).** When a `team_members` row is written, the room should tell that user's browser to re-subscribe so newly visible records arrive. `notifyTeamMembershipChange` in `deepspace/dist/worker.js` reads `record.data.UserId` (capital U), but records are keyed by column name (`userId`), so the lookup is always empty and the re-subscribe never fires. Workaround in Noteriety: remount the spaces list after a successful join. Worth reporting to DeepSpace.
+
 ## 10. Write-up outline
 1. **What I built:** one paragraph plus the live link
 2. **DeepSpace integrations:** each with why. Also which ones I skipped and why (payments, LiveKit, etc.).
