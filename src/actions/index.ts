@@ -49,4 +49,34 @@ export const actions: Record<string, ActionHandler<Env>> = {
         //Fallback Cleanup
         return { success: true, data: { spaceId: teamId, joinCode}}
     },
+    joinSpace: async ({userId, params, tools }) => {
+        const code = typeof params.code === 'string' ? params.code.trim().toUpperCase() : ''
+        if (code.length !== 6) {
+            return { success: false, error: 'Join codes are 6 characters.'}
+        }
+
+        const found = await tools.query('spaces', {where: {joinCode: code }, limit: 1})
+        if (!found.success) return found
+        const space = found.data.records[0]
+        if (!space) {
+            return { success: false, error: 'No space found with that code.'}
+        }
+        const teamId = space.recordId
+
+        const existing = await tools.query('team_members', { where: { teamId, userId}, limit: 1})
+        if (!existing.success) return existing
+        if (existing.data.records.length > 0) {
+            return {success: true, data: {spaceId: teamId, alreadyMember: true}}
+        }
+
+        const membership = await tools.create('team_members', {
+            teamId,
+            userId,
+            status: 'active',
+            role: 'member',
+        })
+        if (!membership.success) return membership
+
+        return {success: true, data: {spaceId: teamId, alreadyMember: false}}
+    }
 }
