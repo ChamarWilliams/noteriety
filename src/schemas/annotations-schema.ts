@@ -17,16 +17,16 @@ export const annotationsSchema: CollectionSchema = {
     { name: 'text', storage: 'text', interpretation: 'plain', required: true, maxLength: 1000},
     { name: 'resolved', storage: 'number', interpretation: { kind: 'boolean'}, default: 0}
   ],
-  teamField: 'teamId',
+  teamField: 'teamId', // The 'team' rule reads the space ID from this column
   permissions: {
-    '*': { read: false, create: false, update: false, delete: false},
+    '*': { read: false, create: false, update: false, delete: false}, // Signed-out visitors
     viewer: { read: 'team', create: false, update: false, delete: false},
     member: { 
       read: 'team', 
       create: false, 
       update: 'own', 
       delete: 'own',
-      writableFields: ['text', 'kind', 'x', 'y'],
+      writableFields: ['text', 'kind', 'x', 'y'], // resolved is set by owners and moderators only
     },
     admin: { read: true, create: true, update: true, delete: true},
   },

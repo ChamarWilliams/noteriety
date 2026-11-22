@@ -1,5 +1,9 @@
-import type { ActionHandler, ActionTools } from 'deepspace/worker'
+import type { ActionHandler } from 'deepspace/worker'
 import type { Env } from '../../worker'
+import { annotationActions } from './annotations'
+import { getMembership } from './helpers'
+import { noteActions } from './notes'
+import { resourceActions } from './resources'
 
 //String containing all characters, where A = 0 and B = 1
 const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
@@ -9,18 +13,6 @@ function makeJoinCode(): string {
     const bytes = crypto.getRandomValues(new Uint8Array(6))
     // Shrinks each number to fit the list length then use the remainder as the look up key ie. CODE_CHARS[8] = 'J'
     return Array.from(bytes, (b) => CODE_CHARS[b % CODE_CHARS.length]).join('')
-}
-
-// Returns this user's membership row in a space, or null if they're not in it
-async function getMembership(tools:ActionTools, teamId: string, userId: string) {
-    const result = await tools.query<{ role: string}>('team_members',
-        {
-            where: { teamId, userId },
-            limit: 1,
-        }
-    )
-    if (!result.success) return null
-    return result.data.records[0] ?? null
 }
 
 export const actions: Record<string, ActionHandler<Env>> = {
@@ -103,21 +95,26 @@ export const actions: Record<string, ActionHandler<Env>> = {
         const spaceId = typeof params.spaceId === 'string' ? params.spaceId : ''
         const targetUserId = typeof params.targetUserId === 'string' ? params.targetUserId : ''
         const role = params.role
+        //Input validation
         if (!spaceId || !targetUserId) {
             return { success: false, error: 'Missing space or member.' }
         }
+        // Owner is never assignable here, so ownership can't be handed away
         if (role !== 'moderator' && role !== 'member') {
             return { success: false, error: 'Role must be moderator or member.' }
         }
 
+        // The caller's role comes from the database, never from the browser
         const caller = await getMembership(tools, spaceId, userId)
         if (caller?.data.role !== 'owner') {
             return { success: false, error: 'Only the owner can change roles.' }
         }
+        // The owner stays owner, so a space always has one
         if (targetUserId === userId) {
             return { success: false, error: 'You cannot change your own role.' }
         }
 
+       //Only people already in this space can have their role changed
        const target = await getMembership(tools, spaceId, targetUserId)
        if (!target) {
         return { success: false, error: 'That person is not in this space.' }
@@ -126,6 +123,10 @@ export const actions: Record<string, ActionHandler<Env>> = {
        const updated = await tools.update('team_members', target.recordId, { role })
        if (!updated.success) return updated
 
+       // Success: tell the page whose role changed and to what
        return {success: true, data: { targetUserId, role }}
     },
+    ...resourceActions,
+    ...annotationActions,
+    ...noteActions,
 }
