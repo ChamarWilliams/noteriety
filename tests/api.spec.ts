@@ -15,4 +15,21 @@ test.describe('API tests', () => {
     await page.waitForSelector('[data-testid="app-navigation"]', { timeout: 15000 })
     // If the app loaded and connected, the WS endpoint works
   })
+
+  test('space actions refuse signed-out callers', async ({ request }) => {
+    for (const name of ['addResource', 'addPin', 'createNote', 'setMemberRole', 'deleteNote', 'toggleVote', 'setFeatured']) {
+      const res = await request.post(`/api/actions/${name}`, { data: {} })
+      expect(res.status(), name).toBe(401)
+    }
+  })
+
+  test('space files refuse signed-out callers', async ({ request }) => {
+    expect((await request.get('/api/space-files/resources/any-id')).status()).toBe(401)
+    expect((await request.get('/api/space-files/notes/any-id')).status()).toBe(401)
+  })
+
+  test('space presence rooms refuse signed-out callers', async ({ request }) => {
+    const res = await request.get('/ws/presence/space:any-id', { headers: { Upgrade: 'websocket' } })
+    expect(res.status()).toBe(401)
+  })
 })

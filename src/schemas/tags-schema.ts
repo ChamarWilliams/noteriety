@@ -11,10 +11,10 @@ export const tagsSchema: CollectionSchema = {
     { name: 'name', storage: 'text', interpretation: 'plain', required: true, maxLength: 40},
 
   ],
-  teamField: 'teamId',
-  uniqueOn: ['teamId', 'name'],
+  teamField: 'teamId', // The 'team' rule reads the space ID from this column
+  uniqueOn: ['teamId', 'name'], // No duplicate tag names within one space
   permissions: {
-    '*': { read: false, create: false, update: false, delete: false},
+    '*': { read: false, create: false, update: false, delete: false}, // Signed-out visitors
     viewer: { read: 'team', create: false, update: false, delete: false},
     member: { read: 'team', create: false, update: false, delete: false,},
     admin: { read: true, create: true, update: true, delete: true},

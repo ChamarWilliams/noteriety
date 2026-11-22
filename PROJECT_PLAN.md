@@ -251,4 +251,8 @@ Record decisions, problems, fixes and what you tested as you go. It becomes the 
 
 | Date | Section | What happened / decided | Verified how |
 |---|---|---|---|
-| | | | |
+| Nov 19 | 4–8 | Short on time: Claude (AI agent) wrote Sections 4–8 at my request; I review and test. Disclose this in the write-up. | tsc, lint, build, 13 smoke/API tests incl. signed-out 401s |
+| Nov 19 | 5 | Files go to the uploader's private R2 folder; others read them only through a membership-checked worker route | API test: signed-out gets 401 |
+| Nov 21 | 9 | Claude added votes (`uniqueOn` one per person) and featured notes; 10–12 cut to next steps | tsc, lint, build, 11 tests |
+| Nov 21 | 14 | README + submission-note draft; secret scan clean | Grep |
+| Nov 19 | 7 | Presence rooms are open by name in the SDK, so a guard checks space membership first | API test: signed-out gets 401 |

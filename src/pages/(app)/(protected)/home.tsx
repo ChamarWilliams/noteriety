@@ -2,9 +2,9 @@ import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { KeyRound, Plus, Users } from 'lucide-react'
 import { Badge, Button, EmptyState, Input, Label, Textarea, useToast } from '@/components/ui'
-import { getAuthToken, useAuth, useQuery } from 'deepspace'
-
-type SpaceRole = 'owner' | 'moderator' | 'member'
+import { useAuth, useQuery } from 'deepspace'
+import { callAction } from '@/lib/actions'
+import { ROLE_LABEL, type SpaceRole } from '@/lib/space'
 
 // One card in the list: a space plus my role in it
 interface SpaceRow {
@@ -13,28 +13,6 @@ interface SpaceRow {
   description: string
   joinCode: string
   role: SpaceRole
-}
-
-const ROLE_LABEL: Record<SpaceRole, string> = {
-  owner: 'Owner',
-  moderator: 'Moderator',
-  member: 'Member',
-}
-
-// Calls a server action with my sign-in token so the server knows who I am
-async function callAction<T>(name: string, params: Record<string, unknown>) {
-  try {
-    const token = await getAuthToken()
-    const res = await fetch(`/api/actions/${name}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify(params),
-    })
-    return (await res.json()) as { success: boolean; data?: T; error?: string }
-  } catch {
-    // Network failure: answer in the same shape as a server error
-    return { success: false, error: 'Could not reach the server. Check your connection.' }
-  }
 }
 
 export default function HomePage() {

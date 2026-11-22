@@ -16,6 +16,7 @@ import { resourcesSchema } from './schemas/resources-schema'
 import { notesSchema } from './schemas/notes-schema'
 import { tagsSchema } from './schemas/tags-schema'
 import { annotationsSchema } from './schemas/annotations-schema'
+import { votesSchema } from './schemas/votes-schema'
 
 export const schemas: CollectionSchema[] = [
   usersSchema,
@@ -26,4 +27,5 @@ export const schemas: CollectionSchema[] = [
   notesSchema,
   tagsSchema,
   annotationsSchema,
+  votesSchema,
 ]

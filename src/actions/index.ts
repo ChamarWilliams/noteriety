@@ -1,5 +1,9 @@
 import type { ActionHandler } from 'deepspace/worker'
 import type { Env } from '../../worker'
+import { annotationActions } from './annotations'
+import { getMembership } from './helpers'
+import { noteActions } from './notes'
+import { resourceActions } from './resources'
 
 //String containing all characters, where A = 0 and B = 1
 const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
@@ -50,7 +54,7 @@ export const actions: Record<string, ActionHandler<Env>> = {
         // Success: send back the new space's ID and join code
         return { success: true, data: { spaceId: teamId, joinCode}}
     },
-    joinSpace: async ({userId, params, tools }) => {
+    joinSpace: async ({ userId, params, tools }) => {
         //Retrieving the cleaned code input
         const code = typeof params.code === 'string' ? params.code.trim().toUpperCase() : ''
         //Input Validation
@@ -86,5 +90,43 @@ export const actions: Record<string, ActionHandler<Env>> = {
 
         // Success: tell the page which space was joined
         return {success: true, data: {spaceId: teamId, alreadyMember: false}}
-    }
+    },
+    setMemberRole: async ({ userId, params, tools }) => {
+        const spaceId = typeof params.spaceId === 'string' ? params.spaceId : ''
+        const targetUserId = typeof params.targetUserId === 'string' ? params.targetUserId : ''
+        const role = params.role
+        //Input validation
+        if (!spaceId || !targetUserId) {
+            return { success: false, error: 'Missing space or member.' }
+        }
+        // Owner is never assignable here, so ownership can't be handed away
+        if (role !== 'moderator' && role !== 'member') {
+            return { success: false, error: 'Role must be moderator or member.' }
+        }
+
+        // The caller's role comes from the database, never from the browser
+        const caller = await getMembership(tools, spaceId, userId)
+        if (caller?.data.role !== 'owner') {
+            return { success: false, error: 'Only the owner can change roles.' }
+        }
+        // The owner stays owner, so a space always has one
+        if (targetUserId === userId) {
+            return { success: false, error: 'You cannot change your own role.' }
+        }
+
+       //Only people already in this space can have their role changed
+       const target = await getMembership(tools, spaceId, targetUserId)
+       if (!target) {
+        return { success: false, error: 'That person is not in this space.' }
+       }
+
+       const updated = await tools.update('team_members', target.recordId, { role })
+       if (!updated.success) return updated
+
+       // Success: tell the page whose role changed and to what
+       return {success: true, data: { targetUserId, role }}
+    },
+    ...resourceActions,
+    ...annotationActions,
+    ...noteActions,
 }
